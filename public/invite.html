@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tạo Thư Mời | Sử Sang Chương</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="branding">
+      <img src="/assets/reviewbds_logo.png" alt="Review BĐS Logo" class="logo">
+    </div>
+    <h1>SỬ SANG CHƯƠNG</h1>
+    <p>Hệ thống tạo thư mời sự kiện chuyên nghiệp</p>
+  </header>
+
+  <main>
+    <form id="inviteForm">
+      <label for="template">Chọn mẫu thư mời:</label>
+      <select id="template"></select>
+
+      <label for="photoUpload">Tải ảnh cá nhân:</label>
+      <input type="file" id="photoUpload" accept="image/*" required>
+
+      <label for="fullName">Họ và tên:</label>
+      <input type="text" id="fullName" placeholder="Nhập họ tên" required>
+
+      <label for="position">Chức vụ:</label>
+      <input type="text" id="position" placeholder="Nhập chức vụ" required>
+
+      <label for="company">Công ty:</label>
+      <select id="company"></select>
+      <input type="text" id="newCompany" class="hidden-company-input" placeholder="Nhập tên công ty">
+
+      <button type="submit">Tạo thư mời</button>
+    </form>
+
+    <canvas id="invitePreview"></canvas>
+    <button id="downloadBtn">Tải về PNG</button>
+  </main>
+
+  <footer>
+    <p>© 2025 Review BĐS – All rights reserved</p>
+  </footer>
+
+  <script src="/script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+</body>
+</html>
