@@ -5,41 +5,389 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tạo Thư Mời | Sử Sang Chương</title>
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: url('/assets/Background.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    header {
+      background: transparent;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .branding {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+
+    .logo {
+      height: 500px;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+      transition: all 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #fff;
+      margin: 10px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+      margin-top: 140px;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .form-title {
+      color: #b60000;
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #b60000;
+      font-weight: 700;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+    .form-group i {
+    color: #b60000;
+    font-size: 20px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* Bỏ absolute để theo flex layout */
+    top: auto;
+    left: auto;
+    transform: none;
+    }
+
+    .form-control {
+      width: 100%;
+      height: 52px;
+      padding: 0 15px 0 50px;
+      border: 1px solid rgba(182, 0, 0, 0.2);
+      border-radius: 8px;
+      font-size: 1rem;
+      line-height: 52px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    select.form-control {
+      height: 52px;
+      line-height: normal;
+      padding-top: 0;
+      padding-bottom: 0;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+
+    /* Điều chỉnh riêng cho input file */
+    input[type="file"].form-control {
+      line-height: normal;
+      padding-top: 14px;
+    }
+
+    /* Điều chỉnh cho Choices.js select */
+    .choices {
+      margin-bottom: 0;
+    }
+
+     .choices__inner {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 15px !important;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(182, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .choices__item--selectable {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .choices__list--single {
+      padding: 0;
+    }
+
+    .choices__list--single .choices__item {
+      font-size: 1rem;
+    }
+
+    .form-control:focus {
+      border-color: #b60000;
+      box-shadow: 0 0 0 3px rgba(182, 0, 0, 0.1);
+      outline: none;
+      background: #fff;
+    }
+
+    .preview-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .preview-title {
+      color: #b60000;
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #b60000;
+      width: 100%;
+      text-align: center;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #b60000, #800000);
+      color: #fff;
+      width: auto;
+      min-width: 200px;
+      margin: 0 auto;
+      padding: 14px 40px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #800000, #b60000);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(182, 0, 0, 0.3);
+    }
+
+    .btn-download {
+      background: #28a745;
+      color: #fff;
+      margin-top: 20px;
+      padding: 14px 28px;
+      font-size: 1rem;
+    }
+
+    .btn-download:hover {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    footer {
+      background: none;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+      font-weight: 700;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      .form-container, .preview-container {
+        padding: 20px;
+      }
+
+      .logo {
+        height: 60px;
+      }
+    }
+
+    .loading {
+      position: relative;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      margin: -12px 0 0 -12px;
+      border: 3px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .form-container, .preview-container {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-container:hover, .preview-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+    }
+
+    .branding img {
+      filter: drop-shadow(0 0 16px #fff) brightness(1.3) contrast(1.2);
+      background: rgba(255,255,255,0.18);
+      border-radius: 18px;
+      padding: 8px 24px;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <div class="branding">
-      <img src="/assets/reviewbds_logo.png" alt="Review BĐS Logo" class="logo">
-    </div>
-    <h1>SỬ SANG CHƯƠNG</h1>
-    <p>Hệ thống tạo thư mời sự kiện chuyên nghiệp</p>
+    <!-- Đã xoá logo và title theo yêu cầu -->
   </header>
 
   <main>
-    <form id="inviteForm">
-      <label for="template">Chọn mẫu thư mời:</label>
-      <select id="template"></select>
+    <div class="form-container">
+      <h2 class="form-title">THÔNG TIN TRUYỀN THÔNG </h2>
+      <form id="inviteForm">
+        <div class="form-group">
+          <label>
+            <i class="fas fa-file-image"></i>
+            Chọn mẫu truyền thông
+          </label>
+          <select id="template" class="form-control"></select>
+        </div>
 
-      <label for="photoUpload">Tải ảnh cá nhân:</label>
-      <input type="file" id="photoUpload" accept="image/*" required>
+        <div class="form-group">
+          <label>
+            <i class="fas fa-user-circle"></i>
+            Tải ảnh cá nhân
+          </label>
+          <input type="file" id="photoUpload" class="form-control" accept="image/*" required>
+        </div>
 
-      <label for="fullName">Họ và tên:</label>
-      <input type="text" id="fullName" placeholder="Nhập họ tên" required>
+        <div class="form-group">
+          <label>
+            <i class="fas fa-user"></i>
+            Họ và tên
+          </label>
+          <input type="text" id="fullName" class="form-control" placeholder="Nhập họ tên" required>
+        </div>
 
-      <label for="position">Chức vụ:</label>
-      <input type="text" id="position" placeholder="Nhập chức vụ" required>
+        <div class="form-group">
+          <label>
+            <i class="fas fa-briefcase"></i>
+            Chức vụ
+          </label>
+          <input type="text" id="position" class="form-control" placeholder="Nhập chức vụ" required>
+        </div>
 
-      <label for="company">Công ty:</label>
-      <select id="company"></select>
-      <input type="text" id="newCompany" class="hidden-company-input" placeholder="Nhập tên công ty">
+        <div class="form-group">
+          <label>
+            <i class="fas fa-building"></i>
+            Công ty
+          </label>
+          <select id="company" class="form-control"></select>
+          <input type="text" id="newCompany" class="form-control hidden-company-input" placeholder="Nhập tên công ty">
+        </div>
 
-      <button type="submit">Tạo thư mời</button>
-    </form>
+        <div class="btn-container">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-magic"></i>
+            Tạo thư mời
+          </button>
+        </div>
+      </form>
+    </div>
 
-    <canvas id="invitePreview"></canvas>
-    <button id="downloadBtn">Tải về PNG</button>
+    <div class="preview-container">
+      <h2 class="preview-title">XEM TRƯỚC THÔNG TIN</h2>
+      <canvas id="invitePreview"></canvas>
+      <button id="downloadBtn" class="btn btn-download">
+        <i class="fas fa-download"></i>
+        Tải về PNG
+      </button>
+    </div>
   </main>
 
   <footer>

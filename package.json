@@ -1,19 +1,27 @@
 {
-  "name": "invitation",
+  "name": "invitation-app",
   "version": "1.0.0",
+  "description": "Ứng dụng tạo thư mời",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prod": "pm2 start ecosystem.config.js --env production"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "multer": "^1.4.4"
+    "mongoose": "^7.0.3",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "pm2": "^5.3.0"
   },
   "keywords": [
     "review"
   ],
   "author": "Hoang",
-  "license": "ISC",
-  "description": ""
+  "license": "ISC"
 }

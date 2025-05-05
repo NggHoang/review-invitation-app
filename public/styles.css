@@ -1,9 +1,9 @@
-
 body {
   font-family: 'Montserrat', sans-serif;
   margin: 0;
   padding: 0;
-  background: #f9f9f9;
+  background: url('/public/assets/Background.png') no-repeat center top fixed;
+  background-size: cover;
   color: #222;
 }
 
@@ -57,13 +57,13 @@ form label {
 
 form input, form select, form button {
   width: 100%;
-  padding: 10px;
+  padding: 10px 16px 16px 16px;
   margin-top: 5px;
   margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1em;
-  font-family: inherit;
+  font-family: Montserrat;
   box-sizing: border-box;
 }
 
@@ -74,6 +74,14 @@ form input:focus, form select:focus {
 }
 
 form button {
+  display: block;
+  max-width: 300px;
+  margin: 40px auto 30px;
+  font-size: 1.2em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 50px;
+  box-shadow: 0 8px 20px rgba(182, 0, 0, 0.2);
   background-color: #b60000;
   color: white;
   font-weight: 600;
@@ -86,7 +94,30 @@ form button:hover {
   background-color: #880000;
 }
 
+button#downloadBtn {
+  display: block;
+  max-width: 280px;
+  margin: 20px auto 40px;
+  font-size: 1.1em;
+  text-transform: uppercase;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button#downloadBtn:hover {
+  background-color: #000;
+  transform: translateY(-2px);
+}
+
 canvas {
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid #ccc;
   margin-top: 20px;
   background: #fff;
@@ -117,4 +148,95 @@ footer {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* === Slide từ phải vào (cho card template) === */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.7s ease-out;
+}
+
+/* === Ánh vàng bo quanh avatar === */
+.avatar-glow {
+  border-radius: 50%;
+  box-shadow: 0 0 15px 3px #ffd700;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+/* === Hover glow avatar === */
+.avatar-glow:hover {
+  box-shadow: 0 0 25px 6px #ffeb3b;
+}
+
+/* === Nút gradient đỏ → đen === */
+button.gradient-btn {
+  background: linear-gradient(135deg, #b60000, #000);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  padding: 12px 28px;
+  font-size: 1.1em;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+button.gradient-btn:hover {
+  background: #ffd700;
+  color: #222;
+  transform: scale(1.05);
+}
+
+/* === Pulse khi tạo thư mời thành công === */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+  }
+}
+
+.pulse-once {
+  animation: pulse 1.2s ease-out 1;
+}
+
+.choices {
+  margin-bottom: 0;
+}
+.choices__inner {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px 0 16px !important;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(182, 0, 0, 0.2);
+  border-radius: 8px;
+}
+.choices__item--selectable {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.choices__list--single {
+  padding: 0;
+}
+.choices__list--single .choices__item {
+  font-size: 1rem;
 }

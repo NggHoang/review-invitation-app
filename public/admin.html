@@ -81,6 +81,11 @@
     .btn:hover {
       background-color: #880000;
     }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
@@ -93,6 +98,7 @@
         <th>File ảnh</th>
         <th>Trạng thái</th>
         <th>Lượt tải</th>
+        <th>Thao tác</th>
       </tr>
     </thead>
     <tbody id="templateList">
@@ -129,10 +135,31 @@
             <td>${tpl.file}</td>
             <td>${tpl.active ? "Hiển thị" : "Ẩn"}</td>
             <td>${tpl.downloads || 0}</td>
+            <td>
+              <button class="btn btn-small" onclick="toggle(${index})">
+                ${tpl.active ? "Ẩn" : "Hiện"}
+              </button>
+            </td>
           `;
           tableBody.appendChild(row);
         });
       });
+
+      function toggle(index) {
+  console.log("Toggle request gửi đến:", index);
+  fetch(`/api/templates/${index}/toggle`, {
+    method: "POST"
+  }).then((res) => {
+    if (!res.ok) {
+      alert("Lỗi server khi cập nhật mẫu");
+      return;
+    }
+    location.reload();
+  }).catch(err => {
+    console.error("Lỗi gọi API toggle:", err);
+    alert("Không thể kết nối server.");
+  });
+}
   </script>
 </body>
 </html>

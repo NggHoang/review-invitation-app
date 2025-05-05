@@ -1,4 +1,3 @@
-
 const form = document.getElementById("inviteForm");
 const photoUpload = document.getElementById("photoUpload");
 const fullName = document.getElementById("fullName");
@@ -36,16 +35,12 @@ fetch(`${API_BASE}/api/templates`)
     });
   });
 
-// Load companies
-fetch(`${API_BASE}/api/companies`)
+  fetch(`${API_BASE}/api/companies`)
   .then(res => res.json())
   .then(companies => {
     companySelect.innerHTML = "";
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "other";
-    defaultOption.textContent = "-- Thêm công ty mới --";
-    companySelect.appendChild(defaultOption);
 
+    //Thêm từng công ty trước
     companies.forEach(name => {
       const option = document.createElement("option");
       option.textContent = name;
@@ -53,10 +48,17 @@ fetch(`${API_BASE}/api/companies`)
       companySelect.appendChild(option);
     });
 
+    //Cuối cùng mới thêm dòng "Thêm công ty mới"
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "other";
+    defaultOption.textContent = "-- THÊM CÔNG TY MỚI --";
+    companySelect.appendChild(defaultOption);
+
     new Choices(companySelect, {
       searchEnabled: true,
       itemSelectText: '',
       placeholder: true,
+      shouldSort: false,
     });
   });
 
@@ -103,6 +105,19 @@ downloadBtn.addEventListener("click", () => {
     alert("Vui lòng tải ảnh cá nhân trước khi tải thư mời.");
     return;
   }
+  // Lưu dữ liệu người dùng trước khi tải
+  fetch(`${API_BASE}/api/save-invite`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: fullName.value.trim(),
+      position: position.value.trim(),
+      company: companySelect.value === "other" ? newCompanyInput.value.trim() : companySelect.value,
+      template: templateSelect.value,
+      time: new Date().toISOString()
+    })
+  });
+  // Tải ảnh
   const link = document.createElement("a");
   link.download = "thu-moi.png";
   link.href = canvas.toDataURL();
@@ -110,8 +125,8 @@ downloadBtn.addEventListener("click", () => {
 });
 
 function drawPreview() {
-  const width = 800;
-  const height = 1131;
+  const width = 1280;
+  const height = 1280;
   canvas.width = width;
   canvas.height = height;
 
@@ -137,9 +152,9 @@ function drawContents() {
   const width = canvas.width;
 
   if (userImage) {
-    const avatarSize = 200;
+    const avatarSize = 250;
     const x = width / 2 - avatarSize / 2;
-    const y = 120;
+    const y = 320;
     ctx.save();
     ctx.beginPath();
     ctx.arc(x + avatarSize / 2, y + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2);
@@ -149,15 +164,11 @@ function drawContents() {
     ctx.restore();
   }
 
-  ctx.fillStyle = "#000";
-  ctx.font = "bold 28px Montserrat, sans-serif";
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 35px Montserrat, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(fullName.value || "Họ và tên", width / 2, 360);
-
-  ctx.font = "22px Montserrat, sans-serif";
-  ctx.fillText(position.value || "Chức vụ", width / 2, 400);
-
+  ctx.fillText((fullName.value || "HỌ VÀ TÊN").toUpperCase(), width / 2, 590);
   const companyText = companySelect.value === "other" ? newCompanyInput.value : companySelect.value;
-  ctx.font = "20px Montserrat, sans-serif";
-  ctx.fillText(companyText || "Tên công ty", width / 2, 440);
+  ctx.font = "28px Montserrat, sans-serif";
+  ctx.fillText(`${(position.value || "CHỨC VỤ").toUpperCase()} | ${(companyText || "CÔNG TY").toUpperCase()}`, width / 2, 630);
 }

@@ -4,102 +4,106 @@ const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
 const multer = require("multer");
+const mongoose = require("mongoose");
+
+// Import models
+const Template = require('./models/Template');
+const Company = require('./models/Company');
+const Invite = require('./models/Invite');
 
 const app = express();
-const PORT = 3000;
 
-const TEMPLATE_PATH = path.join(__dirname, "templates.json");
-const COMPANY_PATH = path.join(__dirname, "companies.json");
+// Cấu hình cho môi trường production
+const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/invitation_db';
 
-app.use(cors());
+// Kết nối MongoDB
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('✅ Đã kết nối MongoDB thành công'))
+.catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
+
+// Cấu hình CORS cho production
+const corsOptions = {
+  origin: ['https://reviewbds.com.vn', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static("public"));
 
 // Tải danh sách mẫu
-app.get("/api/templates", (req, res) => {
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send("Lỗi đọc templates.");
-    res.json(JSON.parse(data));
-  });
+app.get("/api/templates", async (req, res) => {
+  try {
+    const templates = await Template.find();
+    res.json(templates);
+  } catch (err) {
+    res.status(500).send("Lỗi đọc templates.");
+  }
 });
 
 // Toggle mẫu
-app.post("/api/templates/:index/toggle", (req, res) => {
-  const index = parseInt(req.params.index);
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send("Lỗi đọc templates.");
-    const templates = JSON.parse(data);
-    if (!templates[index]) return res.status(404).send("Không tìm thấy mẫu.");
-    templates[index].active = !templates[index].active;
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), err => {
-      if (err) return res.status(500).send("Lỗi ghi templates.");
-      res.send("Đã cập nhật.");
-    });
-  });
-});
-
-// Thêm mẫu mới
-app.post("/api/templates/add", (req, res) => {
-  const { name, file } = req.body;
-  if (!name || !file) return res.status(400).send("Thiếu thông tin.");
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    const templates = err ? [] : JSON.parse(data);
-    templates.push({ name, file, active: true, downloads: 0 });
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), err => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.send("Đã thêm mẫu mới.");
-    });
-  });
+app.post("/api/templates/:index/toggle", async (req, res) => {
+  try {
+    const template = await Template.findById(req.params.index);
+    if (!template) return res.status(404).send("Không tìm thấy mẫu.");
+    
+    template.active = !template.active;
+    await template.save();
+    res.send("Đã cập nhật.");
+  } catch (err) {
+    res.status(500).send("Lỗi cập nhật template.");
+  }
 });
 
 // Ghi nhận lượt tải
-app.post("/api/templates/:index/download", (req, res) => {
-  const index = parseInt(req.params.index);
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    const templates = JSON.parse(data);
-    if (!templates[index]) return res.status(404).send("Không tìm thấy mẫu.");
-    templates[index].downloads = (templates[index].downloads || 0) + 1;
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), err => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.send("Đã cập nhật lượt tải.");
-    });
-  });
+app.post("/api/templates/:index/download", async (req, res) => {
+  try {
+    const template = await Template.findById(req.params.index);
+    if (!template) return res.status(404).send("Không tìm thấy mẫu.");
+    
+    template.downloads = (template.downloads || 0) + 1;
+    await template.save();
+    res.send("Đã cập nhật lượt tải.");
+  } catch (err) {
+    res.status(500).send("Lỗi cập nhật lượt tải.");
+  }
 });
 
 // Danh sách công ty
-app.get("/api/companies", (req, res) => {
-  const COMPANIES_PATH = "./companies.json";
-
-  fs.readFile(COMPANIES_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send([]);
-    try {
-      const companies = JSON.parse(data);
-      res.json(companies);
-    } catch {
-      res.status(500).send([]);
-    }
-  });
+app.get("/api/companies", async (req, res) => {
+  try {
+    const companies = await Company.find().sort('name');
+    res.json(companies.map(c => c.name));
+  } catch (err) {
+    res.status(500).send([]);
+  }
 });
 
 // Thêm công ty mới
-app.post("/api/companies/add", (req, res) => {
+app.post("/api/companies/add", async (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(400).send("Thiếu tên công ty.");
-  fs.readFile(COMPANY_PATH, "utf8", (err, data) => {
-    let companies = err ? [] : JSON.parse(data);
-    if (!companies.includes(name)) {
-      companies.push(name);
-      fs.writeFile(COMPANY_PATH, JSON.stringify(companies, null, 2), err => {
-        if (err) return res.status(500).send("Lỗi ghi công ty.");
-        res.send("Đã thêm công ty.");
-      });
-    } else {
-      res.send("Công ty đã tồn tại.");
+  
+  try {
+    const existingCompany = await Company.findOne({ name });
+    if (existingCompany) {
+      return res.send("Công ty đã tồn tại.");
     }
-  });
+    
+    const company = new Company({ name });
+    await company.save();
+    res.send("Đã thêm công ty.");
+  } catch (err) {
+    res.status(500).send("Lỗi thêm công ty.");
+  }
 });
 
-// Upload template image (nếu dùng)
+// Upload template image
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, "public/assets/templates"),
@@ -107,79 +111,71 @@ const upload = multer({
   })
 });
 
-app.post("/api/templates/upload", upload.single("image"), (req, res) => {
+app.post("/api/templates/upload", upload.single("image"), async (req, res) => {
   const { name, file } = req.body;
   if (!name || !file || !req.file) return res.status(400).send("Thiếu thông tin hoặc file.");
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    const templates = err ? [] : JSON.parse(data);
-    templates.push({ name, file, active: true, downloads: 0 });
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), err => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.redirect("/admin.html");
-    });
-  });
+  
+  try {
+    const template = new Template({ name, file, active: true, downloads: 0 });
+    await template.save();
+    res.redirect("/admin.html");
+  } catch (err) {
+    res.status(500).send("Lỗi thêm template.");
+  }
 });
-app.post("/api/templates/add", (req, res) => {
-  const { name, file } = req.body;
-  if (!name || !file) return res.status(400).send("Thiếu thông tin.");
 
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send("Lỗi đọc file.");
-    const templates = JSON.parse(data);
-    templates.push({ name, file, active: true });
-
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), (err) => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.send("Đã thêm mẫu mới.");
-    });
-  });
-});
 // API xoá mẫu
-app.delete("/api/templates/:index", (req, res) => {
-  const index = parseInt(req.params.index);
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send("Lỗi đọc file.");
-    const templates = JSON.parse(data);
-    if (!templates[index]) return res.status(404).send("Không tìm thấy mẫu.");
-    templates.splice(index, 1);
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), (err) => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.send("Đã xoá.");
-    });
-  });
+app.delete("/api/templates/:index", async (req, res) => {
+  try {
+    const template = await Template.findByIdAndDelete(req.params.index);
+    if (!template) return res.status(404).send("Không tìm thấy mẫu.");
+    res.send("Đã xoá.");
+  } catch (err) {
+    res.status(500).send("Lỗi xoá template.");
+  }
 });
 
 // API sửa mẫu
-app.put("/api/templates/:index", (req, res) => {
-  const index = parseInt(req.params.index);
+app.put("/api/templates/:index", async (req, res) => {
   const { field, value } = req.body;
+  if (!['name', 'file'].includes(field)) return res.status(400).send("Không hợp lệ.");
 
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send("Lỗi đọc file.");
-    const templates = JSON.parse(data);
-    if (!templates[index] || !['name', 'file'].includes(field)) return res.status(400).send("Không hợp lệ.");
-
-    templates[index][field] = value;
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), (err) => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.send("Đã cập nhật.");
-    });
-  });
+  try {
+    const template = await Template.findById(req.params.index);
+    if (!template) return res.status(404).send("Không tìm thấy mẫu.");
+    
+    template[field] = value;
+    await template.save();
+    res.send("Đã cập nhật.");
+  } catch (err) {
+    res.status(500).send("Lỗi cập nhật template.");
+  }
 });
-app.post("/api/templates/:index/download", (req, res) => {
-  const index = parseInt(req.params.index);
 
-  fs.readFile(TEMPLATE_PATH, "utf8", (err, data) => {
-    if (err) return res.status(500).send("Lỗi đọc file.");
-    const templates = JSON.parse(data);
-    if (!templates[index]) return res.status(404).send("Không tìm thấy mẫu.");
-
-    templates[index].downloads = (templates[index].downloads || 0) + 1;
-
-    fs.writeFile(TEMPLATE_PATH, JSON.stringify(templates, null, 2), (err) => {
-      if (err) return res.status(500).send("Lỗi ghi file.");
-      res.send("Đã cập nhật lượt tải.");
-    });
-  });
+// Lưu thông tin thư mời
+app.post("/api/save-invite", async (req, res) => {
+  try {
+    const invite = new Invite(req.body);
+    await invite.save();
+    res.send("Đã lưu thông tin thư mời.");
+  } catch (err) {
+    res.status(500).send("Lỗi lưu thông tin thư mời.");
+  }
 });
-app.listen(PORT, () => console.log(`✅ Server chạy tại http://localhost:${PORT}`));
+
+// Xử lý lỗi 404
+app.use((req, res) => {
+  res.status(404).send('Không tìm thấy trang');
+});
+
+// Xử lý lỗi server
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Có lỗi xảy ra!');
+});
+
+// Khởi động server
+app.listen(PORT, () => {
+  console.log(`✅ Server đang chạy tại port ${PORT}`);
+  console.log(`✅ Môi trường: ${process.env.NODE_ENV || 'development'}`);
+});
